@@ -13,7 +13,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 
 # ตั้งค่า layout ของหน้าเว็บ
-st.set_page_config(page_title="ML & NN IS_Project", layout="wide")
+st.set_page_config(page_title="ML&NN IS_Project", layout="wide")
 
 # ----- Custom CSS สำหรับตกแต่งหน้าเว็บ -----
 st.markdown(
