@@ -93,7 +93,6 @@ with tabs[0]:
         - อธิบายทฤษฎีและแนวทางของอัลกอริทึมที่ใช้  
         - สาธิตการทำงานของโมเดลแต่ละประเภทผ่านเว็บแอปพลิเคชันที่พัฒนาโดยใช้ Streamlit  
     """)
-    #st.image("https://via.placeholder.com/1000x300.png?text=Machine+Learning+%26+Neural+Network+Project", use_column_width=True)
 
 # ==========================================================
 # Tab 2: Machine Learning (อธิบายการพัฒนา ML)
