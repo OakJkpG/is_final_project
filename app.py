@@ -12,7 +12,7 @@ from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.models import load_model
 
 # ตั้งค่า layout ของหน้าเว็บ
-st.set_page_config(page_title="Health & Financial ML/NN Project", layout="wide")
+st.set_page_config(page_title="ML/NN Project", layout="wide")
 
 # ----- Custom CSS สำหรับตกแต่งหน้าเว็บ -----
 st.markdown(
