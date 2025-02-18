@@ -74,7 +74,7 @@ def load_label_encoders():
     return encoders
 
 # ----- สร้าง Navigation แบบแท็บด้านบน -----
-tabs = st.tabs(["🏠 Home", "📘 ML Explanation", "📙 NN Explanation", "🤖 ML Model Demo", "🤖 ML Model Demo"])
+tabs = st.tabs(["🏠 Home", "📘 ML Explanation", "📙 NN Explanation", "🤖 ML Model Demo", "🧠 NN Model Demo"])
 
 # ==========================================================
 # Tab 1: Overview
