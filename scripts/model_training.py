@@ -1,84 +1,94 @@
-# scripts/model_training.py
+# model_training.py
 import os
 import pickle
-import numpy as np
 import pandas as pd
-from sklearn.model_selection import train_test_split
+import numpy as np
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.cluster import KMeans
+from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
-import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout
+from tensorflow.keras.optimizers import Adam
 
-# นำเข้าโมดูลสำหรับเตรียมข้อมูล
-from data_preparation import prepare_dataset1, prepare_dataset2
+# นำเข้า module สำหรับเตรียมข้อมูล
+from data_preparation import prepare_health_data, prepare_financial_data
 
-def train_dataset1_models():
-    # เตรียมข้อมูล Dataset1
-    df1, le_feature, le_target = prepare_dataset1(file_path='../IS_final_project/data/dataset1.csv')
+##############################
+# Training Models for Health Data (Machine Learning)
+##############################
+def train_health_models():
+    # เตรียมข้อมูล Health Data
+    df_health, le_risk = prepare_health_data()
     
-    # บันทึก encoders เพื่อใช้ในเว็บแอป
-    os.makedirs('../IS_final_project/models', exist_ok=True)
-    with open('../IS_final_project/models/label_encoders.pkl', 'wb') as f:
-        pickle.dump({'le_feature': le_feature, 'le_target': le_target}, f)
+    # ใช้ฟีเจอร์ BMI, BloodPressure, HeartRate เพื่อจำแนกประเภท Risk
+    X = df_health[['BMI', 'BloodPressure', 'HeartRate']]
+    y = df_health['Risk_enc']
     
-    # เตรียมข้อมูลสำหรับ Decision Tree
-    X = df1[['Feature_A', 'Feature_B', 'Feature_C_enc']]
-    y = df1['Target_enc']
-    
+    # แบ่งข้อมูลเป็น training และ testing set
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     
     # ฝึก Decision Tree Classifier
-    dt_model = DecisionTreeClassifier(random_state=42)
+    dt_model = DecisionTreeClassifier(max_depth=5, min_samples_split=2, random_state=42)
     dt_model.fit(X_train, y_train)
     
+    # ประเมินโมเดลด้วยข้อมูล test
     y_pred = dt_model.predict(X_test)
-    acc = accuracy_score(y_test, y_pred)
-    print("Decision Tree Accuracy:", acc)
+    accuracy = accuracy_score(y_test, y_pred)
+    print(f"Decision Tree Accuracy on Health Data: {accuracy:.2f}")
     
-    # บันทึกโมเดล Decision Tree
-    with open('../IS_final_project/models/decision_tree.pkl', 'wb') as f:
+    # ฝึก K-Means Clustering (unsupervised)
+    kmeans_model = KMeans(n_clusters=3, random_state=42)
+    kmeans_model.fit(X)
+    
+    # สร้างโฟลเดอร์ models หากยังไม่มี
+    os.makedirs("models", exist_ok=True)
+    
+    # บันทึกโมเดลและ LabelEncoder
+    with open("models/health_decision_tree.pkl", "wb") as f:
         pickle.dump(dt_model, f)
+    with open("models/health_kmeans.pkl", "wb") as f:
+        pickle.dump(kmeans_model, f)
+    with open("models/health_label_encoder.pkl", "wb") as f:
+        pickle.dump(le_risk, f)
     
-    # ฝึก KMeans Clustering บนข้อมูลทั้งหมด (unsupervised)
-    kmeans = KMeans(n_clusters=3, random_state=42)
-    kmeans.fit(X)
-    
-    # บันทึกโมเดล KMeans
-    with open('../IS_final_project/models/kmeans.pkl', 'wb') as f:
-        pickle.dump(kmeans, f)
-    
-    print("Dataset1 models trained and saved.")
+    print("Health models saved in 'models/' directory.")
 
-def train_dataset2_model():
-    # เตรียมข้อมูล Dataset2
-    df2 = prepare_dataset2(file_path='../IS_final_project/data/dataset2.csv')
-    X2 = df2[['Sensor1', 'Sensor2', 'Sensor3']]
-    y2 = df2['Output']
+##############################
+# Training Model for Financial Data (Neural Network)
+##############################
+def train_financial_nn():
+    # เตรียมข้อมูล Financial Data
+    df_financial = prepare_financial_data()
     
-    from sklearn.model_selection import train_test_split
-    X2_train, X2_test, y2_train, y2_test = train_test_split(X2, y2, test_size=0.2, random_state=42)
+    # ใช้ฟีเจอร์ StockPrice, Income, Expense เพื่อทำนาย NetProfit
+    X = df_financial[['StockPrice', 'Income', 'Expense']]
+    y = df_financial['NetProfit']
     
-    # สร้าง Neural Network สำหรับ Regression
-    nn_model = Sequential([
+    # แบ่งข้อมูลเป็น training และ testing set
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    
+    # สร้างโมเดล Neural Network สำหรับ Regression
+    model = Sequential([
         Dense(64, input_dim=3, activation='relu'),
         Dropout(0.2),
         Dense(32, activation='relu'),
-        Dense(1)  # Output layer
+        Dense(1)  # Output สำหรับ Regression
     ])
+    model.compile(optimizer=Adam(), loss='mean_squared_error')
     
-    nn_model.compile(loss='mean_squared_error', optimizer='adam')
+    # ฝึกโมเดล
+    history = model.fit(X_train, y_train, epochs=50, batch_size=16, validation_split=0.1, verbose=1)
     
-    history = nn_model.fit(X2_train, y2_train, epochs=50, batch_size=32, validation_split=0.1, verbose=1)
-    
-    loss = nn_model.evaluate(X2_test, y2_test)
-    print("Neural Network Test Loss:", loss)
+    # ประเมินโมเดลด้วยชุด test
+    loss = model.evaluate(X_test, y_test, verbose=0)
+    print(f"Neural Network Test Loss on Financial Data: {loss:.2f}")
     
     # บันทึกโมเดล Neural Network
-    nn_model.save('../IS_final_project/models/neural_network.h5')
-    print("Dataset2 model trained and saved.")
+    os.makedirs("models", exist_ok=True)
+    model.save("models/financial_nn.h5")
+    print("Financial Neural Network model saved as 'models/financial_nn.h5'.")
 
-if __name__ == '__main__':
-    train_dataset1_models()
-    train_dataset2_model()
+if __name__ == "__main__":
+    train_health_models()
+    train_financial_nn()
