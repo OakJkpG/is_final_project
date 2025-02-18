@@ -35,7 +35,8 @@ st.markdown(
         border-bottom: 2px solid #dee2e6;
     }
     </style>
-    """, unsafe_allow_html=True
+    """
+    , unsafe_allow_html=True
 )
 
 # ----- ฟังก์ชันช่วยโหลดข้อมูล CSV -----
@@ -52,9 +53,9 @@ def prepare_health_dataset(df):
 
 # ----- ฟังก์ชันสำหรับเตรียมข้อมูล Financial Data (Neural Network) -----
 def prepare_financial_dataset(df):
-    df['StockPrice'].fillna(df['StockPrice'].mean(), inplace=True)
-    df['Income'].fillna(df['Income'].mean(), inplace=True)
-    df['Expense'].fillna(df['Expense'].mean(), inplace=True)
+    df['StockPrice'] = df['StockPrice'].fillna(df['StockPrice'].mean())
+    df['Income'] = df['Income'].fillna(df['Income'].mean())
+    df['Expense'] = df['Expense'].fillna(df['Expense'].mean())
     return df
 
 # ----- ฟังก์ชันสำหรับโหลดโมเดล Neural Network (สมมุติว่าฝึกไว้แล้ว) -----
@@ -68,19 +69,19 @@ def load_nn_model():
     return model
 
 # ----- สร้างแท็บสำหรับ Navigation -----
-tabs = st.tabs(["Overview", "Machine Learning", "Neural Network", "Demo Machine Learning", "Demo Neural Network"])
+tabs = st.tabs(["🏠 Home", "📘 Machine Learning Explanation", "📙 Neural Network Explanation", "🤖 Machine Learning Model Demo", "🧠 Demo Neural Network Model Demo"])
 
 # ==========================================================
 # Tab 1: Overview
 # ==========================================================
 with tabs[0]:
-    st.title("Overview ของโปรเจค")
+    st.title("🔍 Overview ของโปรเจค")
     st.markdown("""
     **ที่มา:**  
     - ข้อมูลในโปรเจคนี้ถูกสร้างโดย **ChatGPT**
 
     **Dataset 1: Health Data (ข้อมูลสุขภาพ)**  
-    - **ฟีเจอร์:**  
+    - **Features:**  
       - **ID:** รหัสประจำตัวผู้เข้าร่วม  
       - **BMI:** ดัชนีมวลกาย (numeric)  
       - **BloodPressure:** ความดันโลหิต (numeric)  
@@ -90,7 +91,7 @@ with tabs[0]:
       - ฟีเจอร์ BMI, BloodPressure และ HeartRate มี missing values ประมาณ 10%
 
     **Dataset 2: Financial Data (ข้อมูลการเงิน)**  
-    - **ฟีเจอร์:**  
+    - **Features:**  
       - **ID:** รหัสประจำตัวข้อมูล  
       - **StockPrice:** ราคาหุ้น (numeric)  
       - **Income:** รายรับ (numeric)  
@@ -104,7 +105,7 @@ with tabs[0]:
 # Tab 2: Machine Learning (สำหรับ Health Data)
 # ==========================================================
 with tabs[1]:
-    st.title("Machine Learning: Health Data")
+    st.title("📘 Machine Learning: Health Data")
     st.markdown("""
     **การเตรียมข้อมูล:**  
     - เติม missing values ด้วยค่าเฉลี่ยสำหรับ BMI, BloodPressure, และ HeartRate  
@@ -130,7 +131,7 @@ with tabs[1]:
 # Tab 3: Neural Network (สำหรับ Financial Data)
 # ==========================================================
 with tabs[2]:
-    st.title("Neural Network: Financial Data")
+    st.title("📙 Neural Network: Financial Data")
     st.markdown("""
     **การเตรียมข้อมูล:**  
     - เติม missing values ด้วยค่าเฉลี่ยสำหรับ StockPrice, Income, และ Expense  
@@ -153,7 +154,7 @@ with tabs[2]:
 # Tab 4: Demo Machine Learning (สำหรับ Health Data)
 # ==========================================================
 with tabs[3]:
-    st.title("Demo Machine Learning: Health Data")
+    st.title("🤖 Machine Learning Model Demo: Health Data")
     
     st.markdown("### ส่วนที่ 1: Decision Tree Classification")
     with st.form("form_dt"):
@@ -211,14 +212,14 @@ with tabs[3]:
         st.success(f"K-Means แบ่งออกเป็น {n_clusters} คลัสเตอร์แล้ว")
         fig_km, ax_km = plt.subplots(figsize=(8,6))
         sns.scatterplot(x='BMI', y='BloodPressure', hue='Cluster', data=df_health_demo, palette='viridis', ax=ax_km)
-        ax_km.set_title("K-Means Clustering ของ Health Data")
+        ax_km.set_title("K-Means Clustering of Health Data")
         st.pyplot(fig_km)
 
 # ==========================================================
 # Tab 5: Demo Neural Network (สำหรับ Financial Data)
 # ==========================================================
 with tabs[4]:
-    st.title("Demo Neural Network: Financial Data")
+    st.title("🧠 Neural Network Model Demo: Financial Data")
     st.markdown("ป้อนค่าฟีเจอร์เพื่อทำนาย NetProfit")
     col1, col2, col3 = st.columns(3)
     with col1:
