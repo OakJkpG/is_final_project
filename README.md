@@ -1,24 +1,10 @@
 # My IS_final_project Machine Learning Project
 
 ## Overview
-โปรเจคนี้เป็นตัวอย่างการสร้างโมเดล Machine Learning ด้วยข้อมูลที่มีความไม่สมบูรณ์ โดยแบ่งออกเป็น 2 ชุดข้อมูล:
-- **Dataset1:** สำหรับการจำแนกประเภท (Decision Tree) และการจัดกลุ่ม (K-Means)
-- **Dataset2:** สำหรับการทำนายค่า (Regression) ด้วย Neural Network
-
-นอกจากนี้ยังพัฒนาเว็บแอปด้วย Streamlit เพื่อแสดงขั้นตอนการเตรียมข้อมูล การพัฒนาโมเดล และสาธิตการทำงานของโมเดล
-
-## โครงสร้างโปรเจค
-my_streamlit_project/ 
-├── data/
-├── models/
-├── scripts/
-│ ├── generate_data.py
-│ ├── data_preparation.py
-│ └── model_training.py
-├── app.py
-├── requirements.txt
-└── README.md
-
+โปรเจคนี้เป็นตัวอย่างการสร้างโมเดล Machine Learning ด้วยข้อมูลที่มีความไม่สมบูรณ์ โดยแบ่งออกเป็น 3 ชุดข้อมูล:
+- **Dataset1:** การจำแนกประเภท (Decision Tree)
+- **Dataset2:** การจัดกลุ่ม (K-Means)
+- **Dataset3:** การจำแนกรูป (CNN)
 
 ## การติดตั้งและรันโปรเจค
 1. **Clone repository และสร้าง Virtual Environment**  
@@ -34,6 +20,6 @@ my_streamlit_project/
 3. **ฝึก model**
     python model_training.py
 4. **รันเว็บ**
-    streamlit run app.py
+    streamlit run app.py หรือ python -m streamlit run app.py
 
-
+Python Version 3.10.6
