@@ -1,10 +1,9 @@
 # My IS_final_project Machine Learning Project
 
 ## Overview
-โปรเจคนี้เป็นตัวอย่างการสร้างโมเดล Machine Learning ด้วยข้อมูลที่มีความไม่สมบูรณ์ โดยแบ่งออกเป็น 3 ชุดข้อมูล:
-- **Dataset1:** การจำแนกประเภท (Decision Tree)
-- **Dataset2:** การจัดกลุ่ม (K-Means)
-- **Dataset3:** การจำแนกรูป (CNN)
+โปรเจคนี้เป็นตัวอย่างการสร้างโมเดล Machine Learning ด้วยข้อมูลที่มีความไม่สมบูรณ์ โดยแบ่งออกเป็น 2 ชุดข้อมูล:
+- **Dataset1:** การจำแนกประเภทและการจัดกลุ่ม (Decision Tree & K-Means)
+- **Dataset2:** การจำแนกรูป (CNN)
 
 ## การติดตั้งและรันโปรเจค
 1. **Clone repository และสร้าง Virtual Environment**  

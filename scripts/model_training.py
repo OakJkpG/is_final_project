@@ -1,4 +1,3 @@
-# model_training.py
 import os
 import pickle
 import numpy as np
@@ -12,19 +11,24 @@ from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropou
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.preprocessing.image import img_to_array, load_img
 
-# นำเข้า module สำหรับเตรียมข้อมูล
-from data_preparation import prepare_health_data, prepare_financial_data
+# นำเข้า module สำหรับเตรียมข้อมูล (เฉพาะ Financial Data)
+from data_preparation import prepare_financial_data, prepare_digit_images_data
 
 ##############################
-# 1. Training Health Data with Decision Tree (Classification)
+# 1. Training Financial Data with Decision Tree and KMeans
 ##############################
-def train_health_dt():
-    # เตรียมข้อมูล Health Data
-    df_health, le_risk = prepare_health_data()
+def train_financial_dt_kmeans():
+    # เตรียมข้อมูล Financial Data
+    df_financial = prepare_financial_data()
     
-    # เลือกฟีเจอร์สำหรับจำแนกประเภท
-    X = df_health[['BMI', 'BloodPressure', 'HeartRate']]
-    y = df_health['Risk_enc']
+    # สร้าง target ใหม่สำหรับการจำแนก:
+    # กำหนดให้ Profit_Class = 1 หาก NetProfit >= median, 0 หากต่ำกว่า
+    median_profit = df_financial['NetProfit'].median()
+    df_financial['Profit_Class'] = (df_financial['NetProfit'] >= median_profit).astype(int)
+    
+    # เลือกฟีเจอร์และ target สำหรับ Decision Tree
+    X = df_financial[['StockPrice', 'Income', 'Expense']]
+    y = df_financial['Profit_Class']
     
     # แบ่งข้อมูลเป็น training และ testing set
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -36,52 +40,36 @@ def train_health_dt():
     # ประเมินโมเดลด้วยข้อมูล test
     y_pred = dt_model.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred)
-    print(f"Decision Tree Accuracy on Health Data: {accuracy:.2f}")
+    print(f"Decision Tree Accuracy on Financial Data: {accuracy:.2f}")
     
     # สร้างโฟลเดอร์ models หากยังไม่มี
     os.makedirs("models", exist_ok=True)
     
-    # บันทึกโมเดลและ LabelEncoder
-    with open("models/health_decision_tree.pkl", "wb") as f:
+    # บันทึกโมเดล Decision Tree
+    with open("models/financial_decision_tree.pkl", "wb") as f:
         pickle.dump(dt_model, f)
-    with open("models/health_label_encoder.pkl", "wb") as f:
-        pickle.dump(le_risk, f)
     
-    print("Health Decision Tree model saved in 'models/' directory.")
-
-##############################
-# 2. Training Financial Data with KMeans (Clustering)
-##############################
-def train_financial_kmeans():
-    # เตรียมข้อมูล Financial Data
-    df_financial = prepare_financial_data()
-    
-    # เลือกฟีเจอร์สำหรับ clustering
-    X = df_financial[['StockPrice', 'Income', 'Expense']]
-    
-    # สร้างโมเดล KMeans โดยกำหนดจำนวนคลัสเตอร์ (ตัวอย่างเลือก 3 คลัสเตอร์)
+    # ฝึกโมเดล KMeans สำหรับ clustering บนฟีเจอร์เดียวกัน
     kmeans_model = KMeans(n_clusters=3, random_state=42)
     kmeans_model.fit(X)
-    
-    # สร้างโฟลเดอร์ models หากยังไม่มี
-    os.makedirs("models", exist_ok=True)
     
     # บันทึกโมเดล KMeans
     with open("models/financial_kmeans.pkl", "wb") as f:
         pickle.dump(kmeans_model, f)
     
-    print("Financial KMeans model saved as 'models/financial_kmeans.pkl'.")
-    # แสดงผลตัวอย่าง cluster labels
+    print("Financial Decision Tree and KMeans models saved in 'models/' directory.")
     print("Cluster labels (first 10 samples):", kmeans_model.labels_[:10])
 
 ##############################
-# 3. Training Synthetic Image Data with CNN (Regression for Digit Counting)
+# 2. Training Synthetic Image Data with CNN (Regression for Digit Counting)
 ##############################
 def train_digit_cnn():
+    # ก่อนเริ่มฝึก CNN ให้เตรียมข้อมูล label ใหม่ (preparation)
+    prepare_digit_images_data()  # สร้างไฟล์ labels_prepared.csv
     # กำหนด path สำหรับ dataset
     data_dir = "data/digits"
     image_dir = os.path.join(data_dir, "images")
-    labels_csv = os.path.join(data_dir, "labels.csv")
+    labels_csv = os.path.join(data_dir, "labels_prepared.csv")  # ใช้ไฟล์ labels ที่เตรียมไว้แล้ว
     
     # โหลด labels
     df = pd.read_csv(labels_csv)
@@ -131,6 +119,5 @@ def train_digit_cnn():
     print("CNN model for digit counting saved as 'models/digit_count_cnn.h5'.")
 
 if __name__ == "__main__":
-    train_health_dt()
-    train_financial_kmeans()
+    train_financial_dt_kmeans()
     train_digit_cnn()

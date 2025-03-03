@@ -1,4 +1,3 @@
-# generate_data.py
 import os
 import pandas as pd
 import numpy as np
@@ -9,34 +8,18 @@ from PIL import Image
 np.random.seed(42)
 
 ##############################################
-# ส่วนที่ 1: สร้าง ML Dataset (Health & Financial Data)
+# ส่วนที่ 1: สร้าง ML Dataset (Financial Data)
 ##############################################
-
-# จำนวนข้อมูลสำหรับ ML dataset
-n_health = 200
 n_financial = 200
 
-# สร้าง Health Data Dataset
-health_df = pd.DataFrame({
-    'ID': np.arange(1, n_health + 1),
-    'BMI': np.random.normal(25, 4, n_health),
-    'BloodPressure': np.random.normal(120, 15, n_health),
-    'HeartRate': np.random.normal(75, 10, n_health),
-    'Risk': np.random.choice(['Low', 'Medium', 'High'], size=n_health, p=[0.4, 0.4, 0.2])
-})
-
-# แทรก missing values (~10%) ในฟีเจอร์ BMI, BloodPressure, HeartRate
-for col in ['BMI', 'BloodPressure', 'HeartRate']:
-    mask = np.random.rand(n_health) < 0.1
-    health_df.loc[mask, col] = np.nan
-
-# สร้าง Financial Data Dataset
+# สร้าง Financial Dataset
 financial_df = pd.DataFrame({
     'ID': np.arange(1, n_financial + 1),
     'StockPrice': np.random.normal(200, 30, n_financial),
     'Income': np.random.normal(75000, 10000, n_financial),
     'Expense': np.random.normal(50000, 8000, n_financial)
 })
+
 # คำนวณ NetProfit = Income - Expense + noise
 noise = np.random.normal(0, 2000, n_financial)
 financial_df['NetProfit'] = financial_df['Income'] - financial_df['Expense'] + noise
@@ -50,21 +33,13 @@ for col in ['StockPrice', 'Income', 'Expense']:
 if not os.path.exists('data'):
     os.makedirs('data')
 
-# บันทึก ML datasets เป็นไฟล์ CSV
-health_df.to_csv('data/health_dataset.csv', index=False)
+# บันทึก Financial Dataset เป็นไฟล์ CSV
 financial_df.to_csv('data/financial_dataset.csv', index=False)
-
-print("ML Datasets generated: 'data/health_dataset.csv' and 'data/financial_dataset.csv'")
-
 
 ##############################################
 # ส่วนที่ 2: สร้าง NN Dataset สำหรับ CNN (Synthetic Digit Images)
 ##############################################
-
-# จำนวน synthetic image ที่ต้องการสร้าง
 n_images = 50
-
-# ขนาด canvas ของ synthetic image
 canvas_size = (64, 64)
 
 # โฟลเดอร์เก็บข้อมูลสำหรับ NN dataset
@@ -72,9 +47,8 @@ output_dir = "data/digits"
 image_dir = os.path.join(output_dir, "images")
 os.makedirs(image_dir, exist_ok=True)
 
-# โหลด MNIST dataset
-(_, _), (x_test, y_test) = mnist.load_data()  # ใช้เฉพาะส่วนทดสอบเป็นฐานตัวอย่าง
-# ปรับขนาดภาพ MNIST ให้อยู่ในรูปแบบ PIL Image
+# โหลด MNIST dataset (ใช้เฉพาะส่วนทดสอบเป็นฐานตัวอย่าง)
+(_, _), (x_test, y_test) = mnist.load_data()
 mnist_images = [Image.fromarray(img) for img in x_test]
 mnist_labels = y_test
 
@@ -82,12 +56,9 @@ mnist_labels = y_test
 records = []
 
 for i in range(n_images):
-    # สร้าง canvas สีขาว
-    canvas = Image.new("L", canvas_size, color=255)  # โหมด L สำหรับ grayscale, 255 = white
-    # จำนวนตัวเลขที่จะวางในภาพนี้ (สุ่ม 3 ถึง 7 ตัว)
-    n_digits = np.random.randint(3, 8)
-    
-    # สร้าง label vector จำนวน 10 ค่า สำหรับตัวเลข 0-9
+    # สร้าง canvas สีขาว (โหมด L สำหรับ grayscale)
+    canvas = Image.new("L", canvas_size, color=255)
+    n_digits = np.random.randint(3, 8)  # จำนวนตัวเลขที่จะวางในภาพ (สุ่ม 3 ถึง 7 ตัว)
     label_vector = np.zeros(10, dtype=int)
     
     for _ in range(n_digits):
@@ -95,33 +66,37 @@ for i in range(n_images):
         idx = np.random.randint(0, len(mnist_images))
         digit_img = mnist_images[idx]
         digit_label = int(mnist_labels[idx])
-        # ปรับขนาดดิจิทให้เล็กลง (เช่น 14x14) เพื่อให้สามารถวางได้หลายตัวใน canvas 64x64
-        digit_img = digit_img.resize((14, 14))
+        digit_img = digit_img.resize((14, 14))  # ปรับขนาดเป็น 14x14
         
-        # เลือกตำแหน่งสุ่มบน canvas ให้แน่ใจว่า digit จะไม่ออกนอกขอบ
+        # เลือกตำแหน่งสุ่มบน canvas (ไม่ให้ออกนอกขอบ)
         max_x = canvas_size[0] - 14
         max_y = canvas_size[1] - 14
-        pos_x = np.random.randint(0, max_x+1)
-        pos_y = np.random.randint(0, max_y+1)
+        pos_x = np.random.randint(0, max_x + 1)
+        pos_y = np.random.randint(0, max_y + 1)
         
         # วาง digit ลงบน canvas
         canvas.paste(digit_img, (pos_x, pos_y))
-        
-        # อัปเดท label vector
         label_vector[digit_label] += 1
+
+    # จำลองความไม่สมบูรณ์ของ label ด้วยการสุ่มตัด label บางครั้ง (20% โอกาส)
+    if np.random.rand() < 0.2:
+        record = {
+            "filename": f"digit_{i:03d}.png",
+            "label": None  # ไม่มี label สำหรับภาพนี้
+        }
+    else:
+        record = {
+            "filename": f"digit_{i:03d}.png",
+            "label": label_vector.tolist()
+        }
     
     # บันทึกภาพ
     filename = f"digit_{i:03d}.png"
     canvas.save(os.path.join(image_dir, filename))
-    
-    # เก็บข้อมูลใน records
-    records.append({
-        "filename": filename,
-        "label": label_vector.tolist()  # แปลง numpy array เป็น list
-    })
+    records.append(record)
 
 # บันทึก labels เป็น CSV สำหรับ NN dataset
 df_labels = pd.DataFrame(records)
 df_labels.to_csv(os.path.join(output_dir, "labels.csv"), index=False)
 
-print(f"Generated {n_images} synthetic digit images and saved labels to {os.path.join(output_dir, 'labels.csv')}")
+print("ML Datasets generated: 'data/financial_dataset.csv' and 'data/digits/labels.csv'")
