@@ -60,7 +60,7 @@ with tabs[0]:
       - **NetProfit:** กำไรสุทธิ (คำนวณจาก Income - Expense พร้อม noise เล็กน้อย)
       
     - **Synthetic Digit Images:**  
-      - รูปภาพขนาด 64x64 พิกเซล ที่มีตัวเลขจาก MNIST กระจายอยู่ในภาพ  
+      - รูปภาพขนาด 64x64 pixel ที่มีตัวเลขจาก MNIST กระจายอยู่ในภาพ  
       - **Label:** เวกเตอร์ขนาด 10 ค่า ระบุจำนวนของตัวเลขแต่ละตัว (0-9)
 
     **3. ความไม่สมบูรณ์ของ Dataset:**  
@@ -117,7 +117,7 @@ with tabs[2]:
     st.markdown("""
     **แนวทางการพัฒนา:**  
     1. **การเตรียมข้อมูล:**  
-       - สร้าง synthetic image โดยสุ่มเลือกตัวเลขจาก MNIST แล้ววางลงบน canvas ขนาด 64x64 พิกเซล  
+       - สร้าง synthetic image โดยสุ่มเลือกตัวเลขจาก MNIST แล้ววางลงบน canvas ขนาด 64x64 pixel  
        - สร้าง label vector ขนาด 10 ค่า ที่ระบุจำนวนของตัวเลขแต่ละตัวในภาพ  
        - จัดการกับความไม่สมบูรณ์ของ label (เช่น กรณีที่ label หาย) โดยการแทนที่ด้วยเวกเตอร์ [0, 0, ..., 0] ซึ่งหมายความว่าไม่มีตัวเลขปรากฏในภาพ
 
@@ -159,7 +159,7 @@ with tabs[3]:
     
     st.markdown("## ส่วนที่ 1: Decision Tree Classification")
     st.markdown("""
-    ในส่วนนี้ เราจะใช้ข้อมูล Financial Data ที่มีฟีเจอร์ **StockPrice**, **Income** และ **Expense**  
+    ในส่วนนี้จะใช้ข้อมูล Financial Data ที่มี feature **StockPrice**, **Income** และ **Expense**  
     โดยคำนวณ **NetProfit** จากข้อมูลที่มีอยู่และสร้าง target ใหม่ **Profit_Class**  
     (Profit_Class = 1 หาก NetProfit อยู่เหนือค่า median, 0 หากต่ำกว่า)  
     จากนั้นฝึกโมเดล Decision Tree เพื่อจำแนกประเภทของ Profit_Class  
@@ -201,7 +201,7 @@ with tabs[3]:
         result = "High Profit" if prediction == 1 else "Low Profit"
         st.success(f"ผลลัพธ์การจำแนก Profit_Class: {result}")
         
-        # แสดงภาพต้นไม้ตัดสินใจ
+        # แสดงภาพต้นไม้ของ Decision Tree
         fig_tree, ax_tree = plt.subplots(figsize=(12,8))
         plot_tree(dt_model, filled=True, feature_names=['StockPrice', 'Income', 'Expense'], class_names=["Low Profit", "High Profit"])
         st.pyplot(fig_tree)

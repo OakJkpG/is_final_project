@@ -11,7 +11,7 @@ from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropou
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.preprocessing.image import img_to_array, load_img
 
-# นำเข้า module สำหรับเตรียมข้อมูล (เฉพาะ Financial Data)
+# นำเข้า module สำหรับเตรียมข้อมูล (Financial Data และ Synthetic Digit Images)
 from data_preparation import prepare_financial_data, prepare_digit_images_data
 
 ##############################
@@ -57,7 +57,7 @@ def train_financial_dt_kmeans():
     with open("models/financial_kmeans.pkl", "wb") as f:
         pickle.dump(kmeans_model, f)
     
-    print("Financial Decision Tree and KMeans models saved in 'models/' directory.")
+    print("สร้าง Financial Decision Tree and KMeans models สำเร็จ")
     print("Cluster labels (first 10 samples):", kmeans_model.labels_[:10])
 
 ##############################
@@ -65,7 +65,7 @@ def train_financial_dt_kmeans():
 ##############################
 def train_digit_cnn():
     # ก่อนเริ่มฝึก CNN ให้เตรียมข้อมูล label ใหม่ (preparation)
-    prepare_digit_images_data()  # สร้างไฟล์ labels_prepared.csv
+    prepare_digit_images_data()
     # กำหนด path สำหรับ dataset
     data_dir = "data/digits"
     image_dir = os.path.join(data_dir, "images")
@@ -116,7 +116,7 @@ def train_digit_cnn():
     # บันทึกโมเดล CNN
     os.makedirs("models", exist_ok=True)
     model.save("models/digit_count_cnn.h5")
-    print("CNN model for digit counting saved as 'models/digit_count_cnn.h5'.")
+    print("สร้าง digit_count_cnn.h5 สำเร็จ")
 
 if __name__ == "__main__":
     train_financial_dt_kmeans()

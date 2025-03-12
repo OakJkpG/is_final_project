@@ -4,7 +4,7 @@ import numpy as np
 from tensorflow.keras.datasets import mnist
 from PIL import Image
 
-# ตั้งค่า seed สำหรับความ reproducible
+# ตั้งค่า seed เพื่อให้ผลลัพธ์เหมือนเดิมทุกครั้งที่รันโค้ด
 np.random.seed(42)
 
 ##############################################
@@ -24,7 +24,7 @@ financial_df = pd.DataFrame({
 noise = np.random.normal(0, 2000, n_financial)
 financial_df['NetProfit'] = financial_df['Income'] - financial_df['Expense'] + noise
 
-# แทรก missing values (~10%) ในฟีเจอร์ StockPrice, Income, Expense
+# แทรก missing values (10%) ในฟีเจอร์ StockPrice, Income, Expense
 for col in ['StockPrice', 'Income', 'Expense']:
     mask = np.random.rand(n_financial) < 0.1
     financial_df.loc[mask, col] = np.nan
@@ -42,7 +42,7 @@ financial_df.to_csv('data/financial_dataset.csv', index=False)
 n_images = 50
 canvas_size = (64, 64)
 
-# โฟลเดอร์เก็บข้อมูลสำหรับ NN dataset
+# folder เก็บข้อมูลสำหรับ NN dataset
 output_dir = "data/digits"
 image_dir = os.path.join(output_dir, "images")
 os.makedirs(image_dir, exist_ok=True)
@@ -62,7 +62,7 @@ for i in range(n_images):
     label_vector = np.zeros(10, dtype=int)
     
     for _ in range(n_digits):
-        # เลือกดิจิทสุ่มจาก MNIST
+        # เลือก digit สุ่มจาก MNIST
         idx = np.random.randint(0, len(mnist_images))
         digit_img = mnist_images[idx]
         digit_label = int(mnist_labels[idx])
@@ -78,7 +78,7 @@ for i in range(n_images):
         canvas.paste(digit_img, (pos_x, pos_y))
         label_vector[digit_label] += 1
 
-    # จำลองความไม่สมบูรณ์ของ label ด้วยการสุ่มตัด label บางครั้ง (20% โอกาส)
+    # จำลองความไม่สมบูรณ์ของ label ด้วยการสุ่มตัด label บางครั้ง (20%)
     if np.random.rand() < 0.2:
         record = {
             "filename": f"digit_{i:03d}.png",

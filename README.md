@@ -1,7 +1,7 @@
-# My IS_final_project Machine Learning Project
+# IS_Final_Project
 
 ## Overview
-โปรเจคนี้เป็นตัวอย่างการสร้างโมเดล Machine Learning ด้วยข้อมูลที่มีความไม่สมบูรณ์ โดยแบ่งออกเป็น 2 ชุดข้อมูล:
+โปรเจคนี้เป็นตัวอย่างการสร้างโมเดล Machine Learning และ Neural Network ด้วยข้อมูลที่มีความไม่สมบูรณ์ โดยแบ่งออกเป็น 2 ชุดข้อมูล:
 - **Dataset1:** การจำแนกประเภทและการจัดกลุ่ม (Decision Tree & K-Means)
 - **Dataset2:** การจำแนกรูป (CNN)
 
@@ -21,4 +21,4 @@
 4. **รันเว็บ**
     streamlit run app.py หรือ python -m streamlit run app.py
 
-Python Version 3.10.6
+Python Version 3.12.9
