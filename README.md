@@ -10,7 +10,6 @@
    git clone <repository_url>
    cd IS_final_project
    python -m venv venv
-   source venv/bin/activate
    venv\Scripts\activate
    pip install -r requirements.txt
 2. **สร้าง Dataset**

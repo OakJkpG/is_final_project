@@ -129,7 +129,8 @@ with tabs[2]:
        - โหลดและเตรียมข้อมูลภาพและ label  
        - ออกแบบสถาปัตยกรรม CNN และกำหนด hyperparameters  
        - ฝึกโมเดลและประเมินผลด้วย test set
-
+       - การใช้โมเดล CNN สำหรับการนับจำนวนตัวเลขในภาพ
+       - แสดงผลลัพธ์ว่ามีเลขและจำนวนของแต่ละเลขอะไรบ้าง โดยใช้ค่าพยากรณ์ที่มากกว่า 0.5 เป็นเกณฑ์ในการตัดสินใจ
     """)
 
     st.subheader("ตัวอย่าง Dataset Synthetic Digit Images ก่อนเตรียมข้อมูล:")
@@ -259,6 +260,12 @@ with tabs[4]:
             prediction = cnn_model.predict(img_array)[0]
             st.success(f"ผลการพยากรณ์: {np.round(prediction, 2)}")
             
+            # แสดงผลลัพธ์ว่ามีเลขอะไรบ้างในรูปและจำนวนของแต่ละเลข
+            predicted_digits = {str(i): int(round(count)) for i, count in enumerate(prediction) if count > 0.5}
+            st.markdown("ตัวเลขที่พบในภาพและจำนวนของแต่ละเลข:")
+            for digit, count in predicted_digits.items():
+                st.markdown(f"ตัวเลข {digit}: {count} ตัว")
+            
             # แสดงกราฟแท่งสำหรับผลการพยากรณ์
             fig, ax = plt.subplots(figsize=(10,6))
             ax.bar(range(10), prediction, color='skyblue')
@@ -266,3 +273,5 @@ with tabs[4]:
             ax.set_ylabel("Prediction value")
             ax.set_title("Predicting the number of digits in an image")
             st.pyplot(fig)
+
+
