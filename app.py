@@ -81,7 +81,7 @@ with tabs[1]:
     st.markdown("""
     **แนวทางการพัฒนา:**  
     1. **การเตรียมข้อมูล:**  
-       - โหลดข้อมูลและเติม missing values ด้วยค่าเฉลี่ยสำหรับ StockPrice, Income, และ Expense
+       - สร้างข้อมูล dataset จำนวน 1000 ชุดจากนั้นโหลดและเติม missing values ด้วยค่าเฉลี่ยสำหรับ StockPrice, Income, และ Expense
        - คำนวณ NetProfit (Income - Expense + noise) และสร้าง target ใหม่ **Profit_Class**  
          โดยกำหนดให้ Profit_Class = 1 หาก NetProfit อยู่เหนือค่า median, และ 0 หากต่ำกว่า
 
@@ -92,7 +92,7 @@ with tabs[1]:
          เป็นอัลกอริทึมการจัดกลุ่ม (Unsupervised Learning) ที่แบ่งข้อมูลออกเป็นคลัสเตอร์ตามความใกล้เคียงของ feature
 
     3. **ขั้นตอนการพัฒนาโมเดล:**  
-       - แบ่งข้อมูลเป็น training/test set  
+       - แบ่งข้อมูลเป็น training 80% /test set 20% 
        - ฝึก Decision Tree เพื่อจำแนก Profit_Class  
        - ฝึก K-Means เพื่อจัดกลุ่มข้อมูลทางการเงิน  
        - ประเมินผลและแสดงผลลัพธ์ เช่น ความแม่นยำ และการวิเคราะห์กลุ่ม (cluster analysis)
@@ -117,9 +117,9 @@ with tabs[2]:
     st.markdown("""
     **แนวทางการพัฒนา:**  
     1. **การเตรียมข้อมูล:**  
-       - สร้าง synthetic image โดยสุ่มเลือกตัวเลขจาก MNIST แล้ววางลงบน canvas ขนาด 64x64 pixel  
+       - สร้าง synthetic image จำนวน 1000 รูปโดยการสุ่มเลือกตัวเลขจาก MNIST แล้ววางลงบน canvas ขนาด 64x64 pixel  
        - สร้าง label vector ขนาด 10 ค่า ที่ระบุจำนวนของตัวเลขแต่ละตัวในภาพ  
-       - จัดการกับความไม่สมบูรณ์ของ label (เช่น กรณีที่ label หาย) โดยการแทนที่ด้วยเวกเตอร์ [0, 0, ..., 0] ซึ่งหมายความว่าไม่มีตัวเลขปรากฏในภาพ
+       - จัดการกับความไม่สมบูรณ์ของ label เช่น กรณีที่ label หาย โดยการแทนที่ด้วยเวกเตอร์ [0, 0, ..., 0] ซึ่งหมายความว่าไม่มีตัวเลขปรากฏในภาพ
 
     2. **ทฤษฎีอัลกอริทึม (CNN):**  
        - ใช้ Convolutional Neural Network (CNN) เพื่อเรียนรู้คุณลักษณะของภาพ  
@@ -127,8 +127,8 @@ with tabs[2]:
 
     3. **ขั้นตอนการพัฒนาโมเดล:**  
        - โหลดและเตรียมข้อมูลภาพและ label  
-       - ออกแบบสถาปัตยกรรม CNN และกำหนด hyperparameters  
-       - ฝึกโมเดลและประเมินผลด้วย test set
+       - ออกแบบโมเดล CNN และกำหนด hyperparameters  
+       - ฝึกโมเดลและประเมินผลด้วย test set 20%
        - การใช้โมเดล CNN สำหรับการนับจำนวนตัวเลขในภาพ
        - แสดงผลลัพธ์ว่ามีเลขและจำนวนของแต่ละเลขอะไรบ้าง โดยใช้ค่าพยากรณ์ที่มากกว่า 0.5 เป็นเกณฑ์ในการตัดสินใจ
     """)
@@ -242,36 +242,45 @@ with tabs[4]:
     
     # ดึง label ของภาพที่เลือกมาแสดง
     selected_label = df_labels[df_labels["filename"] == selected_image]["label"].values[0]
-    st.markdown(f"**Label ของภาพ:** {selected_label}")
     
-    image_path = os.path.join("data/digits/images", selected_image)
-    img = load_img(image_path, color_mode="grayscale", target_size=(64, 64))
-    img_array = img_to_array(img) / 255.0
-    img_array = np.expand_dims(img_array, axis=0)
-    
-    st.image(image_path, caption=f"ตัวอย่าง: {selected_image}", use_container_width=False)
-    
-    # โหลดโมเดล CNN สำหรับ synthetic digit counting
-    cnn_model = load_cnn_model()
-    if cnn_model is None:
-        st.error("โมเดล CNN ไม่พร้อมใช้งาน กรุณาฝึกโมเดลก่อน")
+    if selected_label == [0] * 10:
+        st.error("ภาพนี้ไม่มี label กรุณาเลือกภาพอื่น")
     else:
-        if st.button("พยากรณ์จำนวนตัวเลขในภาพ", key="btn_cnn"):
-            prediction = cnn_model.predict(img_array)[0]
-            st.success(f"ผลการพยากรณ์: {np.round(prediction, 2)}")
-            
-            # แสดงผลลัพธ์ว่ามีเลขอะไรบ้างในรูปและจำนวนของแต่ละเลข
-            predicted_digits = {str(i): int(round(count)) for i, count in enumerate(prediction) if count > 0.5}
-            st.markdown("ตัวเลขที่พบในภาพและจำนวนของแต่ละเลข:")
-            for digit, count in predicted_digits.items():
-                st.markdown(f"ตัวเลข {digit}: {count} ตัว")
-            
-            # แสดงกราฟแท่งสำหรับผลการพยากรณ์
-            fig, ax = plt.subplots(figsize=(10,6))
-            ax.bar(range(10), prediction, color='skyblue')
-            ax.set_xlabel("Number (0-9)")
-            ax.set_ylabel("Prediction value")
-            ax.set_title("Predicting the number of digits in an image")
-            st.pyplot(fig)
+        st.markdown(f"**Label ของภาพ:** {selected_label}")
+        
+        image_path = os.path.join("data/digits/images", selected_image)
+        img = load_img(image_path, color_mode="grayscale", target_size=(64, 64))
+        img_array = img_to_array(img) / 255.0
+        img_array = np.expand_dims(img_array, axis=0)
+        
+        st.image(image_path, caption=f"ตัวอย่าง: {selected_image}", use_container_width=False)
+        
+        # โหลดโมเดล CNN สำหรับ synthetic digit counting
+        cnn_model = load_cnn_model()
+        if cnn_model is None:
+            st.error("โมเดล CNN ไม่พร้อมใช้งาน กรุณาฝึกโมเดลก่อน")
+        else:
+            if st.button("พยากรณ์จำนวนตัวเลขในภาพ", key="btn_cnn"):
+                prediction = cnn_model.predict(img_array)[0]
+                
+                # ตรวจสอบว่าผลการพยากรณ์มีค่าเกิน 0.5 หรือไม่
+                if all(prediction < 0.5):
+                    st.warning("ไม่มีตัวเลขในภาพนี้")
+                else:
+                    st.success(f"ผลการพยากรณ์: {np.round(prediction, 2)}")
+                    
+                    # แสดงผลลัพธ์ว่ามีเลขอะไรบ้างในรูปและจำนวนของแต่ละเลข
+                    predicted_digits = {str(i): int(round(count)) for i, count in enumerate(prediction) if count >= 0.5}
+                    st.markdown("ตัวเลขที่พบในภาพและจำนวนของแต่ละเลข:")
+                    for digit, count in predicted_digits.items():
+                        st.markdown(f"ตัวเลข {digit}: {count} ตัว")
+                    
+                    # แสดงกราฟแท่งสำหรับผลการพยากรณ์
+                    fig, ax = plt.subplots(figsize=(10,6))
+                    ax.bar(range(10), prediction, color='skyblue')
+                    ax.set_xlabel("Number (0-9)")
+                    ax.set_ylabel("Prediction value")
+                    ax.set_title("Predicting the number of digits in an image")
+                    st.pyplot(fig)
 
 

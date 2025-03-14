@@ -10,7 +10,7 @@ np.random.seed(42)
 ##############################################
 # ส่วนที่ 1: สร้าง ML Dataset (Financial Data)
 ##############################################
-n_financial = 200
+n_financial = 1000
 
 # สร้าง Financial Dataset
 financial_df = pd.DataFrame({
@@ -39,7 +39,7 @@ financial_df.to_csv('data/financial_dataset.csv', index=False)
 ##############################################
 # ส่วนที่ 2: สร้าง NN Dataset สำหรับ CNN (Synthetic Digit Images)
 ##############################################
-n_images = 50
+n_images = 1000
 canvas_size = (64, 64)
 
 # folder เก็บข้อมูลสำหรับ NN dataset
